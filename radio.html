@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor de Radio</title>
+	<style>
+		#nav{
+			margin:0;
+			padding:0;
+			width:100%;
+			height:16px;
+			background:red;
+		}
+		#nav1{
+			height:32px;
+			width:18px;
+			background:rgba(255, 255, 255, 50%);
+			margin:auto;
+		}
+		#dentro{
+			height:16px;
+			width:8px;
+			background:green;
+		}
+		p{
+			margin:0;
+			padding:0;
+			width:max-content;
+		}
+	</style>
+</head>
+<body id='bd'>
+	<div id="nav">
+		<div id="dentro">
+			<div id="dnav1"></div>
+		</div>
+	</div>
+	<div style='display:inline-block;'>
+    <button id="backButton">atras</button>
+	<div style='widthmax-content;'>
+		<p id='index'>0</p>
+		<p id='indexend'>0</p>
+		<p id='length'>0</p>
+	</div>
+    <button id="nextButton">adelante</button>
+    <button id="alternarButton">alternar</button>
+	</div>
+    <select name="select">
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="4" selected>4</option>
+		<option value="8">8</option>
+		<option value="16">16</option>
+		<option value="32">32</option>
+		<option value="5">5</option>
+		<option value="10">10</option>
+		<option value="20">20</option>
+		<option value="40">40</option>
+	</select>
+    <button id="playButton">Reproducir Radio</button>
+    <button id="runButton">run profunction</button>
+    <button id="chunkerButton">captar chunk</button>
+    <script src='radio.js'></script>
+    <script>
+	
+		let bd = document.getElementById("bd");
+		let nav = document.getElementById("nav");
+		let dentro = document.getElementById("dentro");
+		let nav1 = document.getElementById("nav1");
+		let boton = document.getElementById("playButton");
+		let runboton = document.getElementById("runButton");
+		let chunkerboton = document.getElementById("chunkerButton");
+		let backboton = document.getElementById("backButton");
+		let nextboton = document.getElementById("nextButton");
+		let alternarboton = document.getElementById("alternarButton");
+		let indexelem = document.getElementById("index");
+		let indexendelem = document.getElementById("indexend");
+		let lengthelem = document.getElementById("length");
+		const selectelem = document.getElementsByName('select')[0];
+		
+		let index = 0, indexend = 0, largo = 0, editablelargo = 0;
+		
+		const audio = new Audio();
+		audio.controls = true;
+		
+		let tomove = false;
+		let running = false;
+		let alterno = true;
+		
+		const navbd = nav.getBoundingClientRect();
+		let dentrobd, xde;
+		let chunkeditable;
+		let elementalternable = indexelem;
+		
+		document.body.appendChild(audio);
+
+		let indexalternable = index;
+		elementalternable.style.color = 'red';
+		
+		alternarboton.addEventListener("mousedown",(e)=>{
+			if(alterno){
+				elementalternable.style.color = 'black';
+				elementalternable = indexendelem;
+				elementalternable.style.color = 'red';
+				indexalternable = indexend;
+				alterno = false;
+			}else{
+				elementalternable.style.color = 'black';
+				elementalternable = indexelem;
+				elementalternable.style.color = 'red';
+				indexalternable = index;
+				alterno = true;
+			}
+		})
+		
+		backboton.addEventListener("mousedown",(e)=>{
+		
+			indexalternable = Math.max(0, indexalternable - parseInt(selectelem.value));
+			elementalternable.textContent =	indexalternable;
+			if(alterno){
+				index = indexalternable;
+			}else{
+				indexend = indexalternable;
+			}
+		})
+		
+		nextboton.addEventListener("mousedown",(e)=>{
+		
+			indexalternable = Math.min(editablelargo, indexalternable + parseInt(selectelem.value));
+			elementalternable.textContent =	indexalternable;
+			if(alterno){
+				index = indexalternable;
+			}else{
+				indexend = indexalternable;
+			}
+		})		
+		
+		chunkerboton.addEventListener("mousedown",(e)=>{
+			if(chunks.length != 0){
+				chunkeditable = chunks;
+				indexendelem.textContent = indexend = editablelargo = chunks.length;
+			}
+		})
+		
+		runboton.addEventListener("mousedown",(e)=>{
+			if(!running){
+				pro();
+				running = true;
+			};
+		})
+		
+		boton.addEventListener("mousedown",(e)=>{
+			const newchunks = [];
+			for (let i = index; i < indexend; i++) {
+				newchunks[i] = chunkeditable[i];
+			}
+		
+			const blob = new Blob(newchunks, { type: 'audio/mpeg' });
+			const audioUrl = URL.createObjectURL(blob);
+			audio.src = audioUrl;
+			audio.play();
+		})
+		
+		/*dentro.addEventListener("mousedown",(e)=>{
+			tomove = true;
+			dentrobd =  dentro.getBoundingClientRect();
+			xde =  e.x;
+			console.log(dentro.getBoundingClientRect().x);
+		})
+		
+		window.addEventListener("mousemove",(e)=>{
+			if(!tomove){
+				return
+			}
+			
+			let x = e.x - (xde - dentrobd.x) - navbd.x;
+			x = Math.min(Math.max(x, 0), nav.getBoundingClientRect().right - nav.getBoundingClientRect().x - dentrobd.width);
+			dentro.style.transform = translate(x, 0);
+			
+		});
+		
+		window.addEventListener("mouseup",()=>{
+			tomove = false;
+			dentrobd =  dentro.getBoundingClientRect();
+		})
+		
+		function translate(x, y){
+			return 'translate('+x+'px, '+y+'px)';
+		}*/
+	</script>
+</body>
+</html>
